@@ -14,9 +14,9 @@ setuptools.setup(
     description="Playwright integration for Scrapy",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="Eugenio Lacuesta",
-    author_email="eugenio.lacuesta@gmail.com",
-    url="https://github.com/scrapy-plugins/scrapy-playwright",
+    author="Krzysztof Kłapyta",
+    author_email="krzychuping@wp.pl",
+    url="https://github.com/krystofair/scrapy-playwright-krystofair-mod",
     packages=["scrapy_playwright"],
     classifiers=[
         "Development Status :: 4 - Beta",
