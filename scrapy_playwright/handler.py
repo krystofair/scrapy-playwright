@@ -300,15 +300,14 @@ class ScrapyPlaywrightDownloadHandler(HTTPDownloadHandler):
                     context_kwargs=request.meta.get("playwright_context_kwargs"),
                     spider=spider,
                 )
-
         await ctx_wrapper.semaphore.acquire()
-
+        spider.logger.info("Applying playwright stealth...")
         # create page when context is not persistent, otherwise get from opened browser.
         if ctx_wrapper.persistent and ctx_wrapper.context.pages:
             page = ctx_wrapper.context.pages[0]
         else:
             page = await ctx_wrapper.context.new_page()
-
+        await stealh_async(page)
         self.stats.inc_value("playwright/page_count")
         total_page_count = self._get_total_page_count()
         logger.debug(
