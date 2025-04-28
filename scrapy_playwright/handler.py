@@ -287,7 +287,8 @@ class ScrapyPlaywrightDownloadHandler(HTTPDownloadHandler):
         return self.context_wrappers[name]
 
     async def _create_page(self, request: Request, spider: Spider) -> Page:
-        """Create a new page in a context, also creating a new context if necessary."""
+        """Create a new page in a context, also creating a new context if necessary.
+        Or get page from opened browser when context is persistent."""
         context_name = request.meta.setdefault("playwright_context", DEFAULT_CONTEXT_NAME)
         # this block needs to be locked because several attempts to launch a context
         # with the same name could happen at the same time from different requests
@@ -301,7 +302,13 @@ class ScrapyPlaywrightDownloadHandler(HTTPDownloadHandler):
                 )
 
         await ctx_wrapper.semaphore.acquire()
-        page = await ctx_wrapper.context.new_page()
+
+        # create page when context is not persistent, otherwise get from opened browser.
+        if ctx_wrapper.persistent and ctx_wrapper.context.pages:
+            page = ctx_wrapper.context.pages[0]
+        else:
+            page = await ctx_wrapper.context.new_page()
+
         self.stats.inc_value("playwright/page_count")
         total_page_count = self._get_total_page_count()
         logger.debug(
